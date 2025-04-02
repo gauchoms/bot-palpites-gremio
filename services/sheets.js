@@ -2,9 +2,13 @@ const { google } = require('googleapis');
 const { GoogleAuth } = require('google-auth-library');
 
 const auth = new GoogleAuth({
-  credentials: JSON.parse(process.env.GOOGLE_CREDENTIALS_B64),
+  credentials: JSON.parse(
+    Buffer.from(process.env.GOOGLE_CREDENTIALS_B64, 'base64').toString('utf-8')
+  ),
   scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
+
+
 
 const regex = /^([\wÀ-ú]+)\s+(\d+)\s*x\s*(\d+)\s+([\wÀ-ú]+)$/i;
 

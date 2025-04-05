@@ -23,6 +23,8 @@
   "scripts": {
   "start": "node index.js",
   "build": "node atualizar_jogos.js"
-  }
+  },
+  "type": "module"
+
 
 }

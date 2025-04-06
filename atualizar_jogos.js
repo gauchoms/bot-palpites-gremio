@@ -1,12 +1,13 @@
 async function atualizarPlanilha() {
   try {
+    console.log('Iniciando atualização da planilha...');
+
     const response = await axios.get('https://v3.football.api-sports.io/fixtures?team=130&next=10', {
       headers: {
         'x-apisports-key': process.env.APIFOOTBALL_KEY,
       },
     });
 
-    // 🐛 Adicionado: printa a resposta crua da API
     console.log('Resposta bruta da API-Football:');
     console.log(JSON.stringify(response.data, null, 2));
 

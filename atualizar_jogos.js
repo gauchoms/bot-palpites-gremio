@@ -20,9 +20,9 @@ async function atualizarPlanilha() {
         jogo.league.name,
       ];
     });
-
     console.log('Jogos a serem inseridos na planilha:');
-    console.log(JSON.stringify(jogos, null, 2));
+    console.log(JSON.stringify(jogos, null, 2)); // <-- Esse aqui imprime bonitinho
+    
     
     await sheets.spreadsheets.values.update({
       spreadsheetId: process.env.SPREADSHEET_ID,

@@ -1,24 +1,55 @@
-require('dotenv').config();
-const express = require('express');
-const bodyParser = require('body-parser');
-const { handlePalpite } = require('./services/sheets');
-const { MessagingResponse } = require('twilio').twiml;
+// atualizar_jogos.js
 
-const app = express();
-app.use(bodyParser.urlencoded({ extended: false }));
+import axios from 'axios';
+import { GoogleAuth } from 'google-auth-library';
+import { google } from 'googleapis';
 
-app.post('/webhook', async (req, res) => {
-  const twiml = new MessagingResponse();
-  const message = req.body.Body;
-  const from = req.body.From;
+// Verifica se a variável está definida
+console.log('GOOGLE_CREDENTIALS_B64 existe?', !!process.env.GOOGLE_CREDENTIALS_B64);
+console.log('Valor (parcial):', (process.env.GOOGLE_CREDENTIALS_B64 || '').slice(0, 50));
 
-  const result = await handlePalpite(from, message);
-  twiml.message(result);
+// Decodifica a variável de ambiente
+const credentials = JSON.parse(
+  Buffer.from(process.env.GOOGLE_CREDENTIALS_B64, 'base64').toString('utf-8')
+);
 
-  res.writeHead(200, { 'Content-Type': 'text/xml' });
-  res.end(twiml.toString());
+const auth = new GoogleAuth({
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Bot rodando na porta ${process.env.PORT}`);
-});
+const sheets = google.sheets({ version: 'v4', auth });
+
+async function atualizarPlanilha() {
+  const response = await axios.get(
+    'https://v3.football.api-sports.io/fixtures?team=130&next=10',
+    {
+      headers: {
+        'x-apisports-key': process.env.APIFOOTBALL_KEY,
+      },
+    }
+  );
+
+  const jogos = response.data.response.map((jogo) => {
+    const data = new Date(jogo.fixture.date);
+    return [
+      data.toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }),
+      jogo.teams.home.name,
+      jogo.teams.away.name,
+      jogo.league.name,
+    ];
+  });
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: process.env.SHEET_ID,
+    range: 'Jogos!A2:D',
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: jogos,
+    },
+  });
+
+  console.log('Planilha atualizada com sucesso!');
+}
+
+atualizarPlanilha().catch(console.error);

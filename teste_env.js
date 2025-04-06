@@ -1,2 +1,1 @@
-console.log('GOOGLE_CREDENTIALS_B64 existe?', !!process.env.GOOGLE_CREDENTIALS_B64);
-console.log('Valor:', process.env.GOOGLE_CREDENTIALS_B64?.substring(0, 30) + '...');
+console.log("GOOGLE_CREDENTIALS_B64:", process.env.GOOGLE_CREDENTIALS_B64 ? "OK (definida)" : "NÃO DEFINIDA");

@@ -29,7 +29,9 @@ async function atualizarPlanilha() {
         jogo.league.name,
       ];
     });
-
+    console.log('Jogos a serem inseridos na planilha:');
+    console.log(JSON.stringify(jogos, null, 2));
+    
     await sheets.spreadsheets.values.update({
       spreadsheetId: process.env.SPREADSHEET_ID,
       range: 'Jogos!A2:D',
